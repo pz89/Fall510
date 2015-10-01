@@ -1,0 +1,95 @@
+---
+title: "HW4"
+author: "Pengnian Zhu"
+date: "2015Äê9ÔÂ30ÈÕ"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+# 1
+1:20   # Create Vector (1,2,3...19,20) continuous integers.
+20:1   # Create vector (20,19,18...2,1) continuous integers.
+c(1:20,19:1) # Create Vector (1,2,3...19,20,19,18...2,1); increasing and then decreasing, so use a comma to seperate each continuous sequence.
+tmp <- c(4,6,3) # Assign a vector (4,6,3) to 'tmp' for later usage.
+rep(tmp,10) # Use the repeat function to repeat the vector (4,6,3) ten times; 10 stands for the times.
+rep(tmp,l=31) # Use the repeat function to repeat the vector (4,6,3); in this case l=31 stands for there are total 31 numbers. Thus number 4 has been counted 11 times. 
+rep(tmp,times=c(10,20,30)) # Use the repeat function to repeat the vector (4,6,3);in this case times=c(10,20,30) means that the corresponding numbers which are 4,6 and 3 should be repeated 10, 20 and 30 times.
+
+```
+
+```{r}
+# 2
+tmp <- seq(3,6,by=.1) # First reassign a sequence start from 3 and end to 6 by .1 each time and name it to 'tmp'.
+exp(tmp)*cos(tmp) # Plug the assign sequence numbers directly to the function which is e^xcos(x) and get a new series of numbers.
+```
+
+```{r}
+# 3a
+(.1^seq(3,36,by=3))*(.2^seq(1,34,by=3)) # The base of all the sequence are the same and their index numbers consist an orderly sequence. Still use the sequence function to represent all the index numbers.
+# 3b
+(2^(1:25))/(1:25) # No need to use sequence function in this case because they all continuous numbers. 
+```
+
+```{r}
+# 4a
+tmp <- 10:100 # Assign a continuous sequence numbers i from 10 to 100 and name it to 'tmp'
+sum(tmp^3+4*tmp^2) # Use the sum function to get the sum of all the expressions by plugging the assign numbers 'tmp' directly.
+# 4b
+tmp <- 1:25 # Assign a continuous sequence numbers i from 1 to 25 and name it to 'tmp'
+sum((2^tmp)/tmp+(3^tmp)/(tmp^2)) # Use the sum function to get the sum of all the expressions by plugging the assign numbers 'tmp' directly.
+
+```
+
+```{r}
+# 5a
+paste("label", 1:30) # Use the paste function to paste the word "label" and replace the number each time from 1 to 30. 
+# 5b
+paste("fn", 1:30, sep="") # Use the paste function to paste the word "fn" and replace the number each time from 1 to 30. Notice that there is a command "sep" to seperate the number and the word with "" which is no space.
+```
+
+```{r}
+# 6a
+set.seed(50)
+xVec <- sample(0:999, 250, replace=T)
+yVec <- sample(0:999, 250, replace=T) # Copy directly from the worksheet and assign two values xVec and yVec which are both two randam sequences that contain 250 numbers each and replace the numbers from 0 to 999.
+yVec[-1]-xVec[-length(xVec)] # Create a new vector from xVec and Yvec. yVec[-1] stands for selecting each numbers except the first one which is y1. xVec[-length(xVec)] stands for selecting each numbers from xVec except the last one which is also the total length of the vector xVec, also named xn. Then processing the operation directly.
+# 6b
+sin(yVec[-length(yVec)]/cos(xVec[-1])) # The same as above, just change to another operation.
+# 6c
+xVec[-c(249,250)]+2*xVec[-c(1,250)]-xVec[-c(1,2)] # All the things still be the same except this time there are two numbers be removed each time from xVec. "-c(249,250)" stands for removing the last two numbers within the vector.  
+# 6d
+sum(exp(-xVec[-1])/(xVec[-length(xVec)]+10)) # Still the same. Just add a sum function to get the sum of numbers within the vectors rather than list all of them. 
+
+```
+
+
+```{r}
+# 7a
+yVec[yVec>600]  # Still using the two vectors xVec and yVec. "[yVec>600]" to select all the numbers greater than 600 within the random vector. 
+# 7b
+which(yVec>600) # Use the which command to find the relevant index of the numbers that satisfy the certain condition; in the case is greater than 600. 
+# 7c
+xVec[yVec>600] # Select the relevant numbers from the vector xVec which have the same positions correspond to the values in yVec. 
+# 7d
+sqrt(abs(xVec-mean(xVec))) # Use "sqrt" to get the square root and "abs" to get the absolute value and "mean" to get the average of the vector which is x bar.
+# 7e
+sum(yVec>max(yVec)-200) # get the total number of elements within the vector yVec which are within 200 of the maximum value term in yVec.  
+# 7f
+sum(xVec%%2==0) # Use the mod operator to get the remainder. If a number is divisible by 2, the remainder should equal to zero. Get the total number of such elements. 
+# 7g
+xVec[order(yVec)] # Use the order command to sort the increasing values in yVec. Keep their relevant positions and use them to sort the numbers within xVec vector.
+# 7h
+yVec[c(T,F,F)] # Use "c(T,F,F)" to select which position should be left. In this case, the position of the first, fourth, seventh and so on will be left (True for the first, False for both the second and the third). Use yVec[] to find the relevant numbers within the vector. 
+```
+
+
+```{r}
+# 8
+1+sum(cumprod(seq(2,38,b=2)/seq(3,39,b=2))) # Use the "cumprod" command to get the cumulative product of each item. Use the sequence function to describe the pattern of the numbers within both denominators and numerators.
+```  
+
+
