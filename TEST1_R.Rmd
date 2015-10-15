@@ -1,0 +1,89 @@
+---
+title: "TEST1_R"
+author: "Pengnian Zhu"
+date: "2015Äê10ÔÂ14ÈÕ"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+# Question 1: Add a logical column to diamond based on the ratio of 1's and 0's in the mtcars$vs variable. The variable in mtcars is numeric meaning that you will need to create a logical equivalent, extend it to the same length as diamonds and add it to diamonds data frame. 
+
+require(ggplot2)
+# Require the ggplot2 package to implement the grammar of graphics.
+require(plyr)
+# Require the plyr package for splitting, applying and combining data.
+data(mtcars)
+# Get the data frame mtcars from the global environment.
+data(diamonds)
+# Get the data frame diamonds from the global environment.
+
+ratio0 <- c(count(mtcars,c("vs"))[1,2]/length(mtcars$vs))
+# Define a variable named ratio0 that shows the ratio of 0's within the mtcars$vs column of variables. Use the count function to count the total number of 0's and divided by the total number of variables within certain column which is computed by using the length function. In this case, when we use the count function to mtcars$vs column, it will show up two columns. One is 0 and 1, another one is their relevant frequency. So the second column is what we need. Thus I use[1,2] to find the first row and second column which is the frequency of 0's.
+ratio1 <- c(count(mtcars,c("vs"))[2,2]/length(mtcars$vs))
+# Same as above, just define a different variable named ratio1 and get the ratio of 1's within the mtcars$vs column of variables.
+false <- rep(F,times=round(length(diamonds$z)*ratio0))
+# Use the ratio 0 that we get previously times the total length of the column z within the diamonds data frame. This may cause a decimal point and use round function to get an integer for that and calculate it into times. Use the rep function to replicate False within certain column for the number of times.
+true <- rep(T,times=round(length(diamonds$z)*ratio1))
+# Same as above, this time replicates True within certain column for the number of times by using the ratio of 1's that we get before.
+diamonds <- cbind(logical=c(true,false),diamonds)
+# Final step is to create a new column named logical to the original data frame diamonds and add all the True and False randamly that we get previously into it by using the cbind function.
+
+
+```
+
+```{r}
+# Question 2: Figure out how to generically extract all factor and logical columns from any data frame so the method you develop can be used on any data.
+
+factor_logical_data <- cbind(diamonds[sapply(diamonds,is.factor)],diamonds[sapply(diamonds,is.logical)])
+# By using the sapply function, we can split all the subgroups of logical and factor columns from the original diamonds data frame,. Using cbind function to combine all the extracted columns together and rename the new data frame into factor_logical_data. 
+
+```
+
+```{r}
+# Question 3: Plot a gray bar graph for every factor and logical variable.
+
+require(gridExtra)
+# Require the package gridExtra to grid graphics.
+factor_cut <- ggplot(factor_logical_data,aes(x=factor_logical_data[[1]]))
+factor_cut <- factor_cut+geom_bar(fill='gray')+labs(x=colnames(factor_logical_data[[1]]))
+# Because there are four columns within the new data frame factor_logical_data; three of them are factor columns and one of them is logical column. I will plot each of them by using ggplot. Define a variable named factor_cut and input the first column of data of the factor_logical_data into the ggplot.Use aes to create a list of unevaluated expressions which performs partial name matching,converts color to colour, and old style R names to ggplot names. Create a bar graph filled with gray colour using the command geom_bar(fill='gray') and put the column names within the cut column as the x-labels using labs function and their relevant frequency as y labels by default.
+factor_color <- ggplot(factor_logical_data,aes(x=factor_logical_data[[2]]))
+factor_color <- factor_color+geom_bar(fill='gray')+labs(x=colnames(factor_logical_data[[2]]))
+# The same as before, just define a new variable named factor_color and input the second column of data from the original data frame. Put the column names within the color column as the x-labels using labs function and their relevant frequency as y labels by default.
+factor_clarity <- ggplot(factor_logical_data,aes(x=factor_logical_data[[3]]))
+factor_clarity <- factor_clarity+geom_bar(fill='gray')+labs(x=colnames(factor_logical_data[[3]])) 
+# The same as before, just define a new variable named factor_clarity and input the third column of data from the original data frame. Put the column names within the clarity column as the x-labels using labs function and their relevant frequency as y labels by default.
+logical_logical <- ggplot(factor_logical_data,aes(x=factor_logical_data[[4]]))
+logical_logical <- logical_logical+geom_bar(fill='gray')+labs(x=colnames(factor_logical_data[[4]]))
+# The same as before, just define a new variable named logical_logical and input the fourth column of data from the original data frame. Put the column names within the logical column which are True and Falso as the x-labels using labs function and their relevant frequency as y labels by default.
+grid.arrange(factor_cut,factor_color,factor_clarity,logical_logical)
+# Use the package gridExtra for grid graphics. Create a mix of the four graphs on the same page by using the grid.arrange function.
+
+
+
+          
+```
+
+
+```{r}
+# Question 4: Create a list of frequency tables that contains one table for each categorical and logical variable in the data frame.
+
+frequency_tables=list()
+# Define a variable named frequency_tables that list each categorical and logical variable and their frequency.
+for (x in 1:ncol(factor_logical_data))
+# Because all the required categorical and logical variables are also in the factor_logical_data data frame, we just need to use that data frame. Use the for loop to select each order of these columns.In this case, the variable x will be assigned into four numbers 1,2,3 and 4. 
+frequency_tables <-c(frequency_tables,list(table(factor_logical_data[x])))
+# For each selected variable x, we can extract the relevant data from each column and use the table function to build a contingency table of the counts at each combination of factor levels. And use the list function to construct all of these tables.
+frequency_tables
+# Display all the four frequency tables.
+
+
+```
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
