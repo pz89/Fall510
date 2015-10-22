@@ -1,0 +1,102 @@
+---
+title: "HW6"
+output: html_document
+---
+
+```{r}
+require(ggplot2)
+require(grid)
+require(gridExtra)
+```
+
+```{r}
+explore <- function(data_frame,bin_size,threshold)
+  {
+data_num=data_frame[sapply(data_frame, is.numeric)]
+data_fac=data_frame[sapply(data_frame,is.factor)]
+data_log=data_frame[sapply(data_frame,is.logical)]
+data_cat=data.frame(data_fac,data_log)
+
+
+
+N=colnames(data_num)
+for (i in seq_along(N))
+  { 
+  for (j in seq_along(bin_size))
+    {
+p1=ggplot(data_num,aes_string(x=N[i]))+geom_density(color="blue")+geom_vline(xintercept=sum(data_num[i])/length(rownames(data_frame)),color="red")
+                                                                             p2=ggplot(data_num,aes_string(x=N[i]))+geom_histogram(fill="blue",binwidth=bin_size[j])+geom_vline(xintercept=sum(data_num[i])/length(rownames(data_frame)), color="red")
+grid.arrange(p1,p2)
+    }
+  }
+
+M=names(data_cat)
+for (i in seq_along(M))
+  { 
+p=ggplot(data_cat, aes_string(x=M[i]))+geom_bar(fill="gray")
+print(p)
+  }
+
+square=0
+for (i in 1:(length(data_num)-1))
+  {
+  for (j in (i+1):length(data_num))
+    {
+    square <- c(square, 
+    summary(lm(data_num[[i]]~data_num[[j]]))$r.squared)
+    }
+  }
+square <- square[-1]
+square
+  
+a <- table(data_cat)
+b <- summary(data_num)
+string=''
+for (i in 1:(length(data_num)-1))
+  {
+  string <- c(string, c(paste(colnames(data_num[i]),colnames(data_num[(i+1):length(data_num)]),sep='-')))
+  }
+string <-string[-1]
+square=0
+for (i in 1:(length(data_num)-1))
+  {
+  for (j in (i+1):length(data_num))
+    {
+    square <- c(square, 
+    summary(lm(data_num[[i]]~data_num[[j]]))$r.squared)
+    }
+  }
+square <- square[-1]
+rsquare<-data.frame(string, square)
+
+select=0
+for (k in 1:length(square))
+  {
+  if (abs(square[k]>0.25)) select <- c(select, k)
+  }
+select <-select[-1]
+greater <-rsquare[select,]
+
+Rlist <-list(a,b,rsquare,greater)
+Rlist
+ }
+```
+
+```{r}
+data=diamonds
+data1=data.frame(1:53920,mtcars$vs)
+equi1=c(0,0,1,1,0,1,0,1,1,1,1,0,0,0,0,0,0,1,1,1)
+equi=append(data1[[2]],equi1)
+equi=as.logical(equi)
+diamonds1=data.frame(data,equi)
+```
+
+
+```{r}
+explore(data_frame=diamonds1,bin_size = c(5,20,50),threshold = 0.25)
+```
+
+```{r}
+explore(data_frame=mtcars,bin_size = c(5,20,50),threshold = 0.25)
+```
+

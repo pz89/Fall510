@@ -1,0 +1,176 @@
+---
+title: "Explore"
+author: "Pengnian Zhu"
+date: "2015Äê10ÔÂ22ÈÕ"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+
+
+require(ggplot2)
+#require a ggplot 2 package for the implementation of the grammar of graphics.
+require(grid)
+#require the grid package to grid graphics
+require(gridExtra)
+#require the gridExtra package to miscellaneous functions for grid graphics.
+
+explore <- function(data_frame,bin_size,threshold)
+#Define the function named explore and name the three input values to data_frame, bin_size and threshold for further test purpose.
+
+data_num=data_frame[sapply(data_frame, is.numeric)]
+#use the function sapply to extract all the numeric variables from the input data_frame and give them a new name called data_num.
+data_fac=data_frame[sapply(data_frame,is.factor)]
+#still use the sapply function to extract all the factor variables from the input data_frame and give them a new name called data_factor.
+data_log=data_frame[sapply(data_frame,is.logical)]
+#still use the sapply function to extract all the logical variables from the input data_frame and give them a new name called data-logical.
+data_cat=data.frame(data_fac,data_log)
+#Here I want to combine the variables within the same class. Thus I create a new data frame called data_categorial which includes the factor and logical data frame. 
+
+# Question 1: Plot a pair of blue histograms with a vertical red line at the mean (one using counts and the other density) for every numerical variable at each bin size specified in the bin sizes input parameter. You can plot individually or as a grid. If you chose to plot as a grid, there should be separate grids for each density-bin size combination. For example, given 5 numeric variables and a vector of three bin sizes will generate 30 individual plots or a total of 6 grid plots (with each grid plot containing 5 subplots).
+
+
+#Here I am going to solve the first problem. 
+N=colnames(data_num)
+#the function called colnames() will returns a list of content names, we assign it to the name of x for the further usage.
+for (i in seq_along(N))
+#the function of seq_along(x) will generate a list of values like[1,2,..., length(x)], and we use i to select each of these values and use them in the for loop.
+  { 
+  for (j in seq_along(bin_size))
+#same as above that the function seq_along(bin_size) will generate a list of values from the input bin_size, and we use j to select each of these values and use them in the second for loop.
+    { 
+p1=ggplot(data_num,aes_string(x=N[i]))+geom_density(color="blue")+geom_vline(xintercept=sum(data_num[i])/length(rownames(data_frame)),color="red")
+# Here I want to generate a ggplot of a density plot. The function aes_string will use to take the variable's name. Besides that, we also add the density layer to the plot and use the blue color. Then I use the geom_vline function to add a vertical line. The behind comment is just to locate the vertical red line which is the average of the variables within numerical colomns by using the total sum divided by the total number which can be computed by using the length function.
+                                                                             p2=ggplot(data_num,aes_string(x=N[i]))+geom_histogram(fill="blue",binwidth=bin_size[j])+geom_vline(xintercept=sum(data_num[i])/length(rownames(data_frame)), color="red")
+# Here I want to generate a ggplot of a histogram plot. The function aes_string will use to take the variable's name. Besides that, we also add the blue histogram to the plot, thus the y label should appear count as default. Then we need to set the width of the bin based on our input binsize. Next I use the geom_vline function to add a vertical line. The behind comment is just to locate the vertical red line which is the average of the variables within numerical colomns by using the total sum divided by the total number which can be computed by using the length function.                                                                            
+grid.arrange(p1,p2)
+# use the grid.arrange function to put all these above two pictures into one.
+    }
+}
+
+
+# Question 2: Plot a gray bar graph for every categorical and binary variable.
+
+# Here I am going to solve the second problem.
+
+M=names(data_cat)
+# Here I use the names() functon to return a list of content from the previous defined data frame called data_categorial and renamed to z for the further usage.
+for (i in seq_along(M))
+#the function of seq_along(z) will generate a list of values like[1,2,..., length(z)], and we use i to select each of these values and use them in the forloop.
+  { 
+bar=ggplot(data_cat, aes_string(x=M[i]))+geom_bar(fill="gray")
+# Here I want to generate a ggplot of a bar graph. The function aes_string will use to take the variable's name from data_categorial which includes every cateforical and binary variable. Besides that, we also add the bar graph to the plot and use the gray color to fill in it. 
+print(bar)
+# return the bar graph. 
+  }
+
+# Question 3; Calculate the r^2(r-square) value for every pair of numerical variables.
+
+# Here I will solve the third question.
+
+square=0
+# the initial value of square to zero.
+for (i in 1:(length(data_num)-1))
+# Here the first for loop is to find every pair of the numeric variables,we just need the last two from the beginning.
+  {
+  for (j in (i+1):length(data_num))
+# Here I just want to make pairs with i by using j which should have one space with each other. 
+    {
+    square <- c(square, 
+    summary(lm(data_num[[i]]~data_num[[j]]))$r.squared)
+# Use the c(square to keep the value and im function will create a linear model of the ith and the jth variable. Use the summary function can get the basic information and r-square is one of them which I commend at last. 
+    }
+  }
+square <- square[-1]
+# Delete the initial value of the square.
+square
+# return the final result of all these r-square values.
+
+# Question 4: Return the following in an R list:
+# a. A frequency table for every categorical and binary variable
+# b. For numerical variables
+# i. A summary statistics table for each numerical variable
+# ii. A data frame that contains each pair of variable names and the associated r-square value.
+# iii. A data frame that contains each pair of variable names and correlation coefficient (Pearson) for all coefficients whose absolute value is greater than the correlation threshold (do not repeat any pairs)
+
+# Here I am going to solve for the fourth problem. 
+
+a <- table(data_cat)
+# I will get all the frequency tables from the data frame named data_categorial which will include all the categorical and binary variable. Define all of these tables to a.
+b <- summary(data_num)
+# Here by using the summary comment, I will get the statistical table for each of the numerical variables.And names these tables to b. 
+string=''
+# Initilize the string to empty.
+for (i in 1:(length(data_num)-1))
+# Some of the pairs contain the same variables has been excludes, thus we only have 1 to length-1 to be considerd.
+  {
+  string <- c(string, c(paste(colnames(data_num[i]),colnames(data_num[(i+1):length(data_num)]),sep='-')))
+}
+# Here we use c(string) so that we can keep the value of the last loop. colname() is used for return the variable's names correspondingly. Then we use diamonds_num[(i+1)];length(data_num)).The paste function combines the variable name and seperate them with'-'.
+string <-string[-1]
+# delate the first value 
+square=0
+for (i in 1:(length(data_num)-1))
+# As mentioned previously, Because we are deining pairs, so they can only be defined within the first to the last but one.
+  {
+  for (j in (i+1):length(data_num))
+# Same as before, the innor loop should only pair with i by using the elements from i+1 to the last one which is the length of data_numeric.
+    {
+    square <- c(square, 
+    summary(lm(data_num[[i]]~data_num[[j]]))$r.squared)
+  }
+# # Use the c(square to keep the value and im function will create a linear model of the ith and the jth variable. Use the summary function can get the basic information and r-square is one of them which I commend at last.
+  }
+square <- square[-1]
+# delate the first value 
+rsquare<-data.frame(string, square)
+# Put the defined two data frames named string and square into one and give it a new name to rsquare.
+
+select=0
+# initize the variable select to zero.
+for (k in 1:length(square))
+# Use a for loop here and select a k to the each of the elements of the data frame square. 
+  {
+  if (abs(square[k]>0.25)) select <- c(select, k)
+# Here I use the abs function to get the absolute value and test if the absolute value is greater than the correlation threshold.
+  }
+select <-select[-1]
+# Delete the initial value of select
+greater <-rsquare[select,]
+# Define a new variable named larger which contains all the rsquare values with select.
+
+Rlist <-list(a,b,rsquare,greater)
+# Define a new variable named rlist which list all of the variables that we get.
+Rlist
+# Show the list.
+}
+
+data=diamonds
+data1=data.frame(1:53920,mtcars$vs)#
+equi1=c(0,0,1,1,0,1,0,1,1,1,1,0,0,0,0,0,0,1,1,1) # Input the data from the previous exercises.
+equi=append(data1[[2]],equi1)#use append() to add the two elements to the dataframe.
+equi=as.logical(equi)#as.logical() to set the class of the variable as logical
+diamonds1=data.frame(data,equi)#use data.frame() to add this colume to original dataframe.
+
+# Question 5: Test your function by using the diamonds data frame you extended to include the VS logical column, a vector of bin sizes (5,20,50), and a correlation threshold of 0.25. Also test your function using the mtcars data.
+
+# Here is all the test part
+
+explore(data_frame=diamonds1,bin_size = c(5,20,50),threshold = 0.25)
+
+explore(data_frame=mtcars,bin_size = c(5,20,50),threshold = 0.25)
+
+```
+
+
+
+
+
+
+
+
