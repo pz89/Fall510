@@ -1,0 +1,207 @@
+---
+title: "Test 2_R"
+author: "Pengnian Zhu"
+date: "2015Äê12ÔÂ3ÈÕ"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+Question 1: Take	samples	of	1%,	10%,	25%,	50%,	80%,	and	100%	of	the	data.	Calculate	the	min,	max,	mean	and	variance	of	the	Whole_wgt	column	from	each	sample	and	store	in	a	dataframe.	There	should	be	6	columns	and	four	rows	in	the	dataframe	(a	column	for	each	sample	size	and	a	row	for	each	measure).	Name	the	mean	row	SampleMean,	the	other	rows	appropriately,	and	the	columns	based	on	the	%	sample.	
+```{r}
+
+uciaddress <- "http://archive.ics.uci.edu/ml/machine-learning-databases/"
+dataset <- "abalone/abalone.data" # Get the data frame from the public website.
+getdataset <- paste(uciaddress, dataset, sep="") # Copy and paste the data from the public website to the local and name it getdataset.
+abalone <- read.csv(getdataset) # Read the data frame getdataset and reassign it as abalone for further usage.
+str(abalone) # Obtain the data structure of the data frame abalone.
+colnames(abalone) <- c("Gender","Length","Diameter",
+                       "Height", "Whole_wgt",
+                       "Shucked_wgt", "Viscera wgt",
+                       "Shell wgt", "Rings") 
+# Here the name of the columns are default and I name each column as the order "gender","length","Diameter" and etc. 
+library(gridExtra) # Obtain the package of gird Extra.
+
+sample_information=function(df) # define a function named sample_information by inserting the data frame later.
+{
+    newdataframe <- data.frame(a=numeric(4),b=numeric(4),c=numeric(4),d=numeric(4),e=numeric(4),f=numeric(4),stringsAsFactors = FALSE) # Define a new data frame with six columns and the property of each is numeric with four rows each.
+    for (sample_size in c(0.01,0.1,0.25,0.5,0.8,1)) # Take the sample size of 1%, 10%, 25%, 50%, 80% and 100% of the data. 
+    {
+        temperary_sample = sample(df,round(length(df)*sample_size)) # take samples of the each sample size and name it as temperary sample.
+        newdataframe=cbind(c(min(temperary_sample),max(temperary_sample),mean(temperary_sample),var(temperary_sample)),newdataframe) # put the minimum,maximum,mean and variance into a new dataframe and name it as newdataframe.
+    }
+    colnames(newdataframe)=c("1%","10%","25%","50%","80%","100%") # Name the columns within newdataframe into "1%,10%,25%,50%,80% and 100%".
+    rownames(newdataframe)=c("Sample Min","Sample Max","Sample Mean","Sample Variance") # Name the rows within the newdataframe into "Sample Min, Sample Max,Sample Mean and Sample Variance".
+    return(newdataframe[,c(1:6)]) # Here I used cbind so it needs to return the first through the sixth columns.
+}
+require(ggplot2) # get the package of ggplot2.
+sample_information(abalone$Whole_wgt) # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function. sample_information.
+```
+
+Question 2: Create	a	grid	of	histograms	that	contains	all	sample	sizes.
+```{r}
+
+grid_histogram <- function(df) # Define a new function named grid_histogram.
+{
+    par(mfrow=c(3,2)) # Divide the grid into 3*2 positions and put six histograms into these positions.
+    for (sample_size in c(0.01,0.10,0.25,0.50,0.80,1))# Take the sample size of 1%, 10%, 25%, 50%, 80% and 100% of the data. 
+    {
+        hist(sample(df,round(length(df)*sample_size)),main=paste("Sample size: ",sample_size*100,"%"),breaks=100,xlab = "Histogram") # Establish the histograms and define their scales and paste the main name of them by using the sample size times 100%. For instance, if the sample size is 0.01 then it will present 1%. Name the x-label as histogram. 
+    }
+}
+grid_histogram(abalone$Whole_wgt)  # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function grid_histogram to show the six histograms within the same grid. 
+```
+
+Question 3:  Implement	a	loop	that	takes	1,000	samples	at	each	of	the	sample	sizes	in	1	above	(except	the	100%	sample!).	Calculate	a	mean	at	each	iteration	and	store	the	results	in	a	dataframe.	There	should	be	four	columns	and	1,000	rows.	Name	the	columns	but	NOT	the	rows.	
+```{r}
+
+df_1000_samples=function(df) # Define a new function name df_1000_samples.
+{
+    newdataframe=data.frame(a=numeric(1000),b=numeric(1000),c=numeric(1000),d=numeric(1000),e=numeric(1000)) # The new data frame contains five columns and 1000 rows for each columns.
+    for (sample_size in c(0.01,0.1,0.25,0.5,0.8)) # Define the sample size into 1%, 10%, 25%, 50% and 80%, except for 100% sample. 
+    {
+        mean_vector=c() # initilize a vector for the storage of sample mean.
+         for (i in (1:1000))
+        {
+            temperatory_sample = sample(df,round(length(df)*sample_size)) # take samples of the each sample size and name it as temperary sample.
+            mean_vector=append(mean_vector,mean(temperatory_sample)) # append sample mean to the mean_vector vector.
+         }
+        newdataframe=cbind(mean_vector,newdataframe) # add the vector to the data frame newdf.
+    }
+    colnames(newdataframe)=c("1%","10%","25%","50%","80%") # Name the column names into "1%, 10%,25%,50% and 80%". 
+    return(newdataframe[,c(1:5)]) # Here I return the first through the fifth columns from the newdataframe data frame. 
+}
+
+df_1000_samples(abalone$Whole_wgt) # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function df_1000_samples to show the tables.
+```
+
+Question 4: Create	another	grid	of	histograms	that	contains	the	four	columns	just	created	and	include	the	100%	sample	from	1.	(HINT:	You	should	create	a	function	to	solve	2	and	reuse	here).
+```{r}
+
+grid_histogram_1000_samples=function(df) # Define a new function named grid_histogram_1000_samples. 
+{
+    par(mfrow=c(3,2)) # Divide the grid into 3*2 positions and put six histograms into each position.
+    newdataframe= df_1000_samples(df) # assign the previous data frame named df_1000_samples into a new dataframe called newdataframe.
+    sample_size=c(0.01,0.1,0.25,0.5,0.8) # Define the sample size as 1%,10%,25%,50% and 80%. 
+    for (i in (1:5)) # Create a for loop for 1%,10%,25%,50% and 80& of sample.
+    {
+        hist(newdataframe[,i],breaks=100,main=paste("Sample size: ",sample_size[i]*100,"%"),xlab="Mean of samples") # Establish the histograms and define their scales and paste the main name of them by using the sample size times 100%. For instance, if the sample size is 0.01 then it will present 1%. Name the x-label as Mean of samples. 
+    }
+    hist(df,breaks=100,main="The histogram of original dataset",xlab="Histogram") # Establish the histograms of the 100% sample size  and paste the main name as the histogram of original. Give the Name of x-label as histogram. 
+    }
+
+grid_histogram_1000_samples(abalone$Whole_wgt) # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function grid_histogram_1000_samples to show the histograms. 
+```
+
+Question 5: Calculate	the	min,	max,	mean	and	variance	of	each	column	from	3	and	of	the	total	dataset	(the	100%	sample).	Append	to	the	dataframe	created	in	1.	Name	the	mean	row	ResampleMean	and	the	others	appropriately.	
+```{r}
+
+information_1000_samples=function(df) # Define a function named information_1000_samples. 
+{
+    newdataframe <- data.frame(a=numeric(8),b=numeric(8),c=numeric(8),d=numeric(8),e=numeric(8),f=numeric(8),stringsAsFactors = FALSE)  # Define a new data frame with six columns and the property of each is numeric with eight rows each.
+    newdf_1000_samples=df_1000_samples(df) # newdf_1000_sample is the data frame created in question 3 with sample mean.
+    newdataframe=cbind(c(min(df),max(df),mean(df),var(df),mean(df),mean(df),mean(df),0),newdataframe) # use the cbind to combine all the relevant information from dataframe.
+    i=5
+    for (sample_size in c(0.01,0.1,0.25,0.5,0.8)) # Use the for loop which concentrate on the first five sample sizes.
+    {
+        if (i>0)
+        {
+            temperatory_sample = sample(df,round(length(df)*sample_size)) # take samples this is what we exactly did in the first question. 
+            newdataframe=cbind(c(min(temperatory_sample),max(temperatory_sample),mean(temperatory_sample),var(temperatory_sample),min(newdf_1000_samples[,i]),max(newdf_1000_samples[,i]),mean(newdf_1000_samples[,i]),var(newdf_1000_samples[,i])),newdataframe) # cbind the min,max,mean and variance into the dataframe newdataframe.
+        }
+        i=i-1
+    }
+    
+    colnames(newdataframe)=c("1%","10%","25%","50%","80%","100%") # name the columns of the newdf data frame into "1%","10%","25%","50%","80%","100%".
+    rownames(newdataframe)=c("Sample Min","Sample Max","Sample Mean","Sample Variance","ResampleMean Min","ResampleMean Max","ResampleMean Mean","ResampleMean Variance") # Name the row of the newdf data frame into "Sample Min","Sample Max","Sample Mean","Sample Variance","ResampleMean Min","ResampleMean Max","ResampleMean Mean","ResampleMean Variance".
+    return (newdataframe[,c(1:6)]) # Here I return the first through the sixth columns from the newdf data frame. 
+}
+
+information_1000_samples(abalone$Whole_wgt) # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function information_1000_samples to show the table.
+```
+
+Question 6: Create	a	single	histogram	of	the	100%	data	and	overlay	and	label	lines	that represent	the	1%,	10%,	25%,	50%,	and	80%	SampleMean.
+```{r}
+
+plot_sample_mean<-function(df) # Define a function named plot_sample_mean. 
+{
+    require(ggplot2) # Get the package of ggplot2. 
+    newdataframe=information_1000_samples(df) # the dataframe newdataframe is the one created in question five where minimum, maximum, mean, variance of sample and resample are stored. 
+    sample_mean=newdataframe[3,] # get the third row which is the Sample Mean
+    label_mean=c("1%","10%","25%","50%","80%")
+    newdf_plot=ggplot(as.data.frame(df),aes(x=df),environment=environment())+geom_histogram(color="grey",fill="grey",binwidth=(max(df)-min(df))/100)
+    for (i in c(1:5)) # get the plot by using the input data frame as the x values and set the histogram fulled with grey color and grey border with the equal length binwidth. 
+    {
+        newdf_plot=newdf_plot+geom_vline(xintercept=sample_mean[[i]],color="red")+annotate("text",y=-range(df)*i,x=sample_mean[[i]],label=label_mean[[i]],size=3) # Besides that, add the red intercept line and also give the label as the relevane sample size, 
+    }
+    return(newdf_plot) # Return the plot. 
+}
+
+plot_sample_mean(abalone$Whole_wgt)  # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function plot_sample_mean to show the plot. 
+```
+
+Question 7: Create	a	second	histogram	of	the	100%	data	and	overlay	and	label	vertical lines	that	represent	the	1%,	10%,	25%,	50%,	and	80%	ResampleMean.	
+```{r}
+
+plot_resample_mean<-function(df) # Define a function named plot_resample_mean. 
+{ 
+    require(ggplot2) # Require the package of ggplot2. 
+    newdataframe=information_1000_samples(df) # the dataframe newdataframe is the one created in question five where minimum, maximum, mean, variance of sample and resample are stored.
+    sample_mean=newdataframe[7,] # get the seventh row which is the resample Mean
+    label_mean=c("1%","10%","25%","50%","80%")
+    newdf_plot=ggplot(as.data.frame(df),aes(x=df),environment=environment())+geom_histogram(color="grey",fill="grey",binwidth=(max(df)-min(df))/100) 
+    for (i in c(1:5)) # get the plot by using the input data frame as the x values and set the grey color histogram fulled with grey color and grey border with the equal length binwidth. 
+    {
+        newdf_plot=newdf_plot+geom_vline(xintercept=sample_mean[[i]],color="red")+annotate("text",y=-range(df)*i,x=sample_mean[[i]],label=label_mean[[i]],size=3)  # Besides that, add the red intercept line and also give the label as the relevant sample size.
+    }
+    return(newdf_plot) # Return the plot. 
+}
+plot_resample_mean(abalone$Whole_wgt)  # Run the specific dataframe column named  abalone$whole_wgt by using the pre-defined function plot_resample_mean to show the plot. 
+```
+
+Question 8: Now	execute	your	code	on	diamonds$carat	and	faithful$eruptions.	
+```{r}
+data(diamonds) # Obtain the data of diamonds.
+sample_information(diamonds$carat) 
+grid_histogram(diamonds$carat)
+df_1000_samples(diamonds$carat)
+grid_histogram_1000_samples(diamonds$carat)
+information_1000_samples(diamonds$carat)
+plot_sample_mean(diamonds$carat)
+plot_resample_mean(diamonds$carat)# Use the previous defined functions to run the data within the column of diamonds$carat one by one. 
+
+data(faithful) # Obtain the data of faithful.
+sample_information(faithful$eruptions) 
+grid_histogram(faithful$eruptions)
+df_1000_samples(faithful$eruptions)
+grid_histogram_1000_samples(faithful$eruptions)
+information_1000_samples(faithful$eruptions)
+plot_sample_mean(faithful$eruptions)
+plot_resample_mean(faithful$eruptions)# Use the previous defined functions to run the data within the column of faithful$eruptions one by one. 
+
+```
+
+
+Question 9:  Provide	a	brief	explanation	of	what	you	observe	in	the	measures	and	histograms	as	it	relates	to	sample	size	and	resampling.
+```{r}
+
+# Answer: 9. Based on the tables and histograms that we established so far, I can find that when the sample size increases, it looks more likely to the overall histogram of the entire dataset.Besides that, Resampling will create a more precise measure or estimate to the overall dataset, especially when the sample size increases.
+
+```
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+
+
