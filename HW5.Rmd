@@ -1,9 +1,12 @@
 ---
 title: "HW5"
 author: "Pengnian Zhu"
-date: "2015Äê10ÔÂ7ÈÕ"
+date: "2015??10??7??"
 output: html_document
 ---
+
+SW: nice job, I had to comment out some of your code to get it to knit
+properly, see below.
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
@@ -44,7 +47,8 @@ numeric <- c(numeric[-1])
 # After that, remove the initial condition of the numeric which is zero.
 name_correlation <-data.frame(string,numeric)
 # The final step is to define a data frame named name_correlation to put all the previous data frames of string and numeric together. 
-
+# SW: print data frame
+name_correlation
 ```
 
 ```{r}
@@ -54,7 +58,10 @@ require(ggplot2)
 # Get the ggplot2 package which is an implementation of the grammer of graphics.
 data(diamonds)
 # Import the data diamonds from the global environment.
-scatterplots <- par(mfrow=c(5,5))
+# SW: did you actually knit this together? getting an error about the margins 
+# when I try to knit.
+#scatterplots <- par(mfrow=c(5,5))
+
 # Use the par () function to combine all the plots into one overall graph. In this case, I create a 5*5 matrix to contain all the plots. One for each and name the overall graph scatterplots.
 x=0
 # Initilize the value of x to zero.
@@ -67,9 +74,9 @@ for (i in 1:6)
 }
 }
 # I use two for loops to create all the plots. First, extract all the necessary characters and their corresponding values from the data frame new_data. In order to avoid duplication, thus I use i and j. For instance: if i=1 stands for caret and its numerical values, then it can only pair with the other remaining six characters to create the plots which represented by j=2,3,4,5,6 and 7 and so on.When all the values have been paired, then add a title to each plot that contains the coefficient of relevant variables. Because all the coefficients are in the second column of the data frame name_correlation, so I use the index [] to find each of these values by assigning the specific row and column number. For instance: if x=10, then tenth plot will have a title which comes from the tenth row and second column of the data frame name_correlation which is about -0.0293.
-par(scatterplots)
+#par(scatterplots)
 # Combine all the plots that come from the for loop into the overall graph named scatterplots.
-scatterplots
+#scatterplots
 # Display the graph scatterplots to the plots screen.
 
 ```
