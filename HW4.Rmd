@@ -1,7 +1,7 @@
 ---
 title: "HW4"
 author: "Pengnian Zhu"
-date: "2015Äê9ÔÂ30ÈÕ"
+date: "2015??9??30??"
 output: html_document
 ---
 
@@ -59,6 +59,11 @@ yVec <- sample(0:999, 250, replace=T) # Copy directly from the worksheet and ass
 yVec[-1]-xVec[-length(xVec)] # Create a new vector from xVec and Yvec. yVec[-1] stands for selecting each numbers except the first one which is y1. xVec[-length(xVec)] stands for selecting each numbers from xVec except the last one which is also the total length of the vector xVec, also named xn. Then processing the operation directly.
 # 6b
 sin(yVec[-length(yVec)]/cos(xVec[-1])) # The same as above, just change to another operation.
+# SW: lost points: your parentheses are wrong, should be
+sin(yVec[-length(yVec)])/cos(xVec[-1])
+```
+
+```{r}
 # 6c
 xVec[-c(249,250)]+2*xVec[-c(1,250)]-xVec[-c(1,2)] # All the things still be the same except this time there are two numbers be removed each time from xVec. "-c(249,250)" stands for removing the last two numbers within the vector.  
 # 6d
